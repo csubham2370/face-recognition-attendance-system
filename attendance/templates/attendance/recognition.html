@@ -1,0 +1,80 @@
+{% extends "attendance/base.html" %}
+{% load static %}
+
+{% block title %}Face Recognition | Face Attendance{% endblock %}
+
+{% block extra_head %}
+<style>
+    .admin-recognition-row {
+        width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .admin-recognition-workspace {
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) minmax(250px, 1fr);
+        gap: 1rem;
+        align-items: start;
+    }
+
+    .admin-recognition-workspace #result {
+        margin-top: 0 !important;
+    }
+
+    .admin-camera-frame {
+        width: 80%;
+        aspect-ratio: 4 / 3;
+        margin-left: auto;
+        margin-right: auto;
+        overflow: hidden;
+        border-radius: var(--bs-border-radius);
+        background: #000;
+    }
+
+    .admin-camera-frame #camera,
+    .admin-camera-frame #canvas {
+        width: 100% !important;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    @media (max-width: 767.98px) {
+        .admin-recognition-row { width: 100%; }
+        .admin-recognition-workspace { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center admin-recognition-row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white"><h1 class="h4 mb-0">Face Recognition Attendance</h1></div>
+            <div class="card-body">
+                {% csrf_token %}
+                <div class="admin-recognition-workspace">
+                    <div>
+                        <div class="admin-camera-frame mb-3">
+                            <video id="camera" class="border rounded" autoplay playsinline></video>
+                        </div>
+                        <canvas id="canvas" class="d-none"></canvas>
+                        <div class="d-flex flex-wrap justify-content-center gap-2">
+                            <button id="startCamera" type="button" class="btn btn-success">Start Camera</button>
+                            <button id="recognizeFace" type="button" class="btn btn-primary" data-url="{% url 'attendance:recognize_face' %}" disabled>Recognize Face</button>
+                            <button id="stopCamera" type="button" class="btn btn-danger" disabled>Stop Camera</button>
+                        </div>
+                    </div>
+                    <div id="result" aria-live="polite"><div class="alert alert-secondary mb-0">Start camera first.</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="{% static 'attendance/js/camera.js' %}"></script>
+<script src="{% static 'attendance/js/recognition_ajax.js' %}"></script>
+{% endblock %}

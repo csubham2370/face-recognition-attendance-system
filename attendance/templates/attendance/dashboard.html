@@ -1,0 +1,77 @@
+{% extends "attendance/base.html" %}
+{% load static %}
+
+{% block title %}Attendance Dashboard | Face Attendance{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <form id="csrfForm">{% csrf_token %}</form>
+    <div class="col">
+        <h1 class="h2">Attendance Dashboard</h1>
+        <p class="text-muted">Date: <span id="dashboardDate">Loading...</span></p>
+    </div>
+</div>
+<section class="card border-0 shadow-sm mb-4">
+    <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+            <h2 class="h5 mb-1">Student Attendance Access</h2>
+            <p class="text-muted mb-0">Students can use face recognition only while attendance is open.</p>
+        </div>
+        <div id="attendanceControl" data-url="{% url 'attendance:set_attendance_control' %}" data-open="{{ attendance_control.is_open|yesno:'true,false' }}" class="d-flex flex-wrap align-items-center gap-2">
+            <span id="attendanceStatus" class="badge fs-6 {% if attendance_control.is_open %}text-bg-success{% else %}text-bg-danger{% endif %}">{% if attendance_control.is_open %}Open{% else %}Closed{% endif %}</span>
+            <button id="startAttendanceButton" type="button" class="btn btn-success" {% if attendance_control.is_open %}disabled{% endif %}>Start Attendance</button>
+            <button id="stopAttendanceButton" type="button" class="btn btn-danger" {% if not attendance_control.is_open %}disabled{% endif %}>Stop Attendance</button>
+        </div>
+    </div>
+    <div id="attendanceControlMessage" class="px-3 pb-3 d-none"></div>
+</section>
+<button type="button" id="trainModelButton" class="btn btn-primary" data-url="{% url 'attendance:train_model' %}">Train the model</button>
+
+<div id="trainingMessage" class="mt-3">
+</div>
+<div class="row g-4 mb-5">
+    <div class="col-md-6 col-lg-3"><div class="card border-0 shadow-sm h-100"><div class="card-body">
+        <h2 class="h6 text-muted">Total Students</h2><p id="totalStudents" class="h2 mb-0">0</p>
+    </div></div></div>
+    <div class="col-md-6 col-lg-3"><div class="card border-0 shadow-sm h-100"><div class="card-body">
+        <h2 class="h6 text-muted">Present Today</h2><p id="presentCount" class="h2 text-success mb-0">0</p>
+    </div></div></div>
+    <div class="col-md-6 col-lg-3"><div class="card border-0 shadow-sm h-100"><div class="card-body">
+        <h2 class="h6 text-muted">Absent Today</h2><p id="absentCount" class="h2 text-danger mb-0">0</p>
+    </div></div></div>
+    <div class="col-md-6 col-lg-3"><div class="card border-0 shadow-sm h-100"><div class="card-body">
+        <h2 class="h6 text-muted">Attendance</h2><p id="attendancePercentage" class="h2 text-primary mb-0">0%</p>
+    </div></div></div>
+</div>
+
+<section class="card border-0 shadow-sm mb-5">
+    <div class="card-header"><h2 class="h5 mb-0">Today's Attendance</h2></div>
+    <div class="card-body">
+        <div class="progress" role="progressbar" aria-label="Today's attendance percentage">
+            <div id="attendanceProgress" class="progress-bar" style="width: 0%">0%</div>
+        </div>
+    </div>
+</section>
+
+<section class="card border-0 shadow-sm">
+    <div class="card-header"><h2 class="h5 mb-0">Recent Attendance</h2></div>
+    <div class="card-body"><div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-dark"><tr>
+                <th scope="col">#</th><th scope="col">Student ID</th><th scope="col">Name</th>
+                <th scope="col">Date</th><th scope="col">Time</th><th scope="col">Confidence</th><th scope="col">Status</th>
+            </tr></thead>
+            <tbody id="recentAttendanceBody"><tr><td colspan="7" class="text-center">Loading...</td></tr></tbody>
+        </table>
+    </div></div>
+</section>
+
+<div id="dashboardConfig" data-url="{% url 'attendance:dashboard_data' %}" class="d-none"></div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="{% static 'attendance/js/dashboard_ajax.js' %}"></script>
+<script src="{% static 'attendance/js/train_model.js' %}"></script>
+<script src="{% static 'attendance/js/attendance_control.js' %}"></script>
+{% endblock %}

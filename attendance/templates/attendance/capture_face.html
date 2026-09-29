@@ -1,0 +1,40 @@
+{% extends "attendance/base.html" %}
+{% load static %}
+
+{% block title %}Capture {{ student.name }}'s Face | Face Attendance{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4 p-md-5">
+                <h1 class="h2 fw-bold mb-1">Capture Face Photos</h1>
+                <p class="text-body-secondary">Student: <strong>{{ student.name }}</strong> ({{ student.student_id }})</p>
+                <div class="alert alert-info">Keep one face centered in good lighting. The system will automatically collect exactly {{ target_count }} detected photos.</div>
+
+                {% csrf_token %}
+                <div id="captureConfig" data-url="{% url 'attendance:capture_face_image' student.id %}" data-target="{{ target_count }}" data-existing="{{ captured_count }}"></div>
+                <div class="ratio ratio-4x3 mb-3 bg-dark rounded overflow-hidden">
+                    <video id="captureCamera" autoplay playsinline muted></video>
+                </div>
+                <canvas id="captureCanvas" class="d-none"></canvas>
+
+                <div class="progress mb-3" role="progressbar" aria-label="Face capture progress" aria-valuemin="0" aria-valuemax="{{ target_count }}">
+                    <div id="captureProgress" class="progress-bar" style="width: {% widthratio captured_count target_count 100 %}%">{{ captured_count }}/{{ target_count }}</div>
+                </div>
+                <div id="captureMessage" class="alert alert-secondary">Press Start Capture and allow camera access.</div>
+                <div class="d-flex flex-wrap gap-2">
+                    <button id="startFaceCapture" class="btn btn-primary" type="button">Start Capture</button>
+                    <button id="stopFaceCapture" class="btn btn-outline-danger" type="button" disabled>Stop</button>
+                    <a class="btn btn-outline-secondary" href="{% url 'attendance:student_detail' student.id %}">Finish Later</a>
+                    <a id="captureDone" class="btn btn-success{% if captured_count < target_count %} d-none{% endif %}" href="{% url 'attendance:student_detail' student.id %}">View Student</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'attendance/js/face_capture.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "attendance/base.html" %}
+
+{% block title %}{{ student.name }} | Face Attendance{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+    <div>
+        <a class="text-decoration-none" href="{% url 'attendance:student_list' %}">&larr; All students</a>
+        <h1 class="display-6 fw-bold mt-2 mb-1">{{ student.name }}</h1>
+        <p class="text-body-secondary mb-0">Student ID: {{ student.student_id }}</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-outline-primary" href="{% url 'attendance:capture_face' student.id %}">Capture Face</a>
+        <a class="btn btn-primary" href="{% url 'attendance:update_student' student.id %}">Edit</a>
+        <a class="btn btn-outline-danger" href="{% url 'attendance:delete_student' student.id %}">Delete</a>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-12 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            {% if student.photo %}
+                <img src="{{ student.photo.url }}" class="card-img-top object-fit-cover" style="max-height: 360px;" alt="Photo of {{ student.name }}">
+            {% else %}
+                <div class="bg-secondary-subtle d-flex align-items-center justify-content-center text-secondary" style="height: 300px;">No photo available</div>
+            {% endif %}
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-4">Email</dt><dd class="col-8 text-break">{{ student.email }}</dd>
+                    <dt class="col-4">Created</dt><dd class="col-8">{{ student.created_at|date:"d M Y, g:i A" }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white"><h2 class="h5 mb-0">Attendance History</h2></div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead><tr><th>Date</th><th>Time</th><th>Status</th><th>Confidence</th></tr></thead>
+                    <tbody>
+                    {% for record in attendance_records %}
+                        <tr>
+                            <td>{{ record.date|date:"d M Y" }}</td>
+                            <td>{{ record.time|time:"g:i:s A" }}</td>
+                            <td>{{ record.status }}</td>
+                            <td>{% if record.confidence is not None %}{{ record.confidence|floatformat:2 }}%{% else %}&mdash;{% endif %}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4" class="text-center text-body-secondary py-4">No attendance records yet.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

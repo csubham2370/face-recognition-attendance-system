@@ -1,0 +1,14 @@
+{% extends "attendance/base.html" %}
+{% load static %}
+{% block title %}Create Admin | Face Attendance{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-12 col-md-8 col-lg-6"><div class="card shadow-sm border-0"><div class="card-body p-4 p-md-5">
+    <h1 class="h2 fw-bold mb-2">Create Admin</h1><p class="text-body-secondary mb-4">Add another administrator to the system.</p>
+    <div id="adminMessage" class="d-none"></div>
+    <form id="createAdminForm" data-url="{% url 'attendance:create_admin' %}">{% csrf_token %}
+        {% for field in form %}<div class="mb-3"><label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}</div>{% endfor %}
+        <div class="d-flex flex-column-reverse flex-sm-row gap-2 pt-2"><a class="btn btn-outline-secondary" href="{% url 'attendance:admin_list' %}">Cancel</a><button type="submit" id="createAdminButton" class="btn btn-primary">Create Admin</button></div>
+    </form>
+</div></div></div></div>
+{% endblock %}
+{% block extra_scripts %}<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script><script src="{% static 'attendance/js/create_admin.js' %}"></script>{% endblock %}

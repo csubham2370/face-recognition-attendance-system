@@ -1,0 +1,68 @@
+{% extends "attendance/base.html" %}
+
+{% block title %}Students | Face Attendance{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+    <div>
+        <h1 class="display-6 fw-bold mb-1">Registered Students</h1>
+        <p class="text-body-secondary mb-0">Manage students and capture their face data.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'attendance:register_student' %}">
+        Register Student
+    </a>
+</div>
+
+<form method="get" class="row g-2 mb-4" role="search">
+    <div class="col-12 col-md-8 col-lg-6">
+        <label class="visually-hidden" for="studentSearch">Search students</label>
+        <input id="studentSearch" class="form-control" type="search" name="q" value="{{ search_query }}" placeholder="Search by ID, name, or email">
+    </div>
+    <div class="col-auto"><button class="btn btn-dark" type="submit">Search</button></div>
+    {% if search_query %}<div class="col-auto"><a class="btn btn-outline-secondary" href="{% url 'attendance:student_list' %}">Clear</a></div>{% endif %}
+</form>
+
+<div class="row g-4">
+    {% for student in students %}
+        <div class="col-12 col-md-6 col-xl-4">
+            <article class="card h-100 border-0 shadow-sm">
+                {% if student.photo %}
+                    <img
+                        src="{{ student.photo.url }}"
+                        class="card-img-top object-fit-cover"
+                        style="height: 240px;"
+                        alt="Photo of {{ student.name }}"
+                    >
+                {% else %}
+                    <div class="bg-secondary-subtle d-flex align-items-center justify-content-center text-secondary" style="height: 240px;">
+                        No photo available
+                    </div>
+                {% endif %}
+
+                <div class="card-body d-flex flex-column">
+                    <h2 class="card-title h4">{{ student.name }}</h2>
+                    <dl class="row mb-4">
+                        <dt class="col-3 text-body-secondary">ID</dt>
+                        <dd class="col-9">{{ student.student_id }}</dd>
+                        <dt class="col-3 text-body-secondary">Email</dt>
+                        <dd class="col-9 text-break">{{ student.email }}</dd>
+                    </dl>
+                    <div class="d-flex flex-wrap gap-2 mt-auto">
+                        <a class="btn btn-primary" href="{% url 'attendance:student_detail' student.id %}">View</a>
+                        <a class="btn btn-outline-secondary" href="{% url 'attendance:update_student' student.id %}">Edit</a>
+                        <a class="btn btn-outline-primary" href="{% url 'attendance:capture_face' student.id %}">Capture Face</a>
+                        <a class="btn btn-outline-danger" href="{% url 'attendance:delete_student' student.id %}">Delete</a>
+                    </div>
+                </div>
+            </article>
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center py-4" role="alert">
+                {% if search_query %}No students match “{{ search_query }}”.{% else %}No students are registered yet. <a class="alert-link" href="{% url 'attendance:register_student' %}">Register the first student</a>.{% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% include "attendance/includes/pagination.html" with page_obj=page_obj item_name="students" %}
+{% endblock %}
